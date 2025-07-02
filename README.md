@@ -30,7 +30,7 @@ docker run -d -p 8080:80 \
 version: '3'
 services:
   wordpress:
-    image: seu-usuario/wordpress-optimized:latest
+    image: fusionlabsbrasil/wordpress-full-swarm:latest
     ports:
       - "8080:80"
     environment:
@@ -52,7 +52,7 @@ services:
 version: '3.8'
 services:
   wordpress:
-    image: seu-usuario/wordpress-optimized:latest
+    image: fusionlabsbrasil/wordpress-full-swarm:latest
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: user
