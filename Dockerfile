@@ -2,7 +2,7 @@
 FROM wordpress:latest
 
 LABEL maintainer="Vilmo Júnior <junior.vopj@acidburn.com.br>"
-LABEL description="WordPress otimizado com suporte completo a PHP, GD e uploads de até 256MB, pronto para Docker Swarm e Portainer"
+LABEL description="WordPress otimizado com suporte completo a PHP, GD, Redis e uploads de até 256MB, pronto para Docker Swarm e Portainer"
 
 # Instalar dependências e extensões PHP adicionais
 RUN apt-get update && apt-get install -y \
@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     mariadb-client \
+    libzstd-dev \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,6 +41,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 # Instalar e habilitar imagick se disponível
 RUN pecl install imagick && docker-php-ext-enable imagick || echo "Imagick não disponível"
 
+# Instalar e habilitar Redis
+RUN pecl install redis && docker-php-ext-enable redis
+
 # Instalar WP-CLI
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \
@@ -58,7 +62,7 @@ COPY docker-entrypoint-custom.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint-custom.sh
 
 # Verificar configurações
-RUN php -i | grep -E 'upload_max_filesize|post_max_size|memory_limit|GD|imagick'
+RUN php -i | grep -E 'upload_max_filesize|post_max_size|memory_limit|GD|imagick|redis'
 
 # Usar o script de entrada personalizado
 ENTRYPOINT ["docker-entrypoint-custom.sh"]
